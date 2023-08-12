@@ -54,8 +54,7 @@ class Block():
 
     def get_nonce(self,address):
         state = rlp.decode(self.state.get(address))
-        if not state or state[0] == 0: return False
-        return state[2]
+        return False if not state or state[0] == 0 else state[2]
 
     def get_balance(self,address):
         state = rlp.decode(self.state.get(address))
@@ -71,8 +70,7 @@ class Block():
     # to call update_contract to finalize the changes.
     def get_contract(self,address):
         state = rlp.decode(self.state.get(address))
-        if not state or state[0] == 0: return False
-        return Trie('statedb',state[2])
+        return False if not state or state[0] == 0 else Trie('statedb',state[2])
 
     def update_contract(self,address,contract):
         state = rlp.decode(self.state.get(address)) or [1,0,'']
