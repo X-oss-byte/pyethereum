@@ -172,7 +172,7 @@ def eval_contract(block,transaction_list,tx):
         val_at_index = decode(contract.get(encode(index,256,32)),256)
         code = [ int(val_at_index / (256**i)) % 256 for i in range(6) ]
         code[0] = scriptcode_map.get(code[0],'INVALID')
-        sys.stderr.write("Evaluating: "+ str(code)+"\n")
+        sys.stderr.write(f"Evaluating: {code}" + "\n")
         # Invalid code instruction or STOP code stops execution sans fee
         if val_at_index >= 256**6 or code[0] in ['STOP','INVALID']:
             sys.stderr.write("stop code, exiting\n")
@@ -201,7 +201,7 @@ def eval_contract(block,transaction_list,tx):
             break
         block.set_balance(address,block.get_balance(address) - nullfee - minerfee)
         block.reward += minerfee
-        sys.stderr.write("evaluating operation\n") 
+        sys.stderr.write("evaluating operation\n")
         # Evaluate operations
         if c == 'ADD':
             reg[code[3]] = (reg[code[1]] + reg[code[2]]) % 2**256
@@ -212,8 +212,7 @@ def eval_contract(block,transaction_list,tx):
         elif c == 'DIV':
             reg[code[3]] = int(reg[code[1]] / reg[code[2]])
         elif c == 'SDIV':
-            sign = 1
-            sign *= (1 if reg[code[1]] < 2**255 else -1)
+            sign = 1 * (1 if reg[code[1]] < 2**255 else -1)
             sign *= (1 if reg[code[2]] < 2**255 else -1)
             x = reg[code[1]] if reg[code[1]] < 2**255 else 2**256 - reg[code[1]]
             y = reg[code[2]] if reg[code[2]] < 2**255 else 2**256 - reg[code[2]]
@@ -222,8 +221,7 @@ def eval_contract(block,transaction_list,tx):
         elif code == 'MOD':
             reg[code[3]] = reg[code[1]] % reg[code[2]]
         elif code == 'SMOD':
-            sign = 1
-            sign *= (1 if reg[code[1]] < 2**255 else -1)
+            sign = 1 * (1 if reg[code[1]] < 2**255 else -1)
             sign *= (1 if reg[code[2]] < 2**255 else -1)
             x = reg[code[1]] if reg[code[1]] < 2**255 else 2**256 - reg[code[1]]
             y = reg[code[2]] if reg[code[2]] < 2**255 else 2**256 - reg[code[2]]
@@ -313,9 +311,7 @@ def eval_contract(block,transaction_list,tx):
             to = encode(reg[code[1]],256,32)
             value = reg[code[2]]
             fee = reg[code[3]]
-            if (value + fee) > block.get_balance(address):
-                pass
-            else:
+            if value + fee <= block.get_balance(address):
                 datan = reg[code[4]]
                 data = []
                 for i in range(datan):

@@ -4,9 +4,11 @@ import random
 def genkey():
     L = random.randrange(30)
     if random.randrange(5) == 0: return ''
-    return ''.join([random.choice('1234579qetyiasdfghjklzxcvbnm') for x in range(L)])
+    return ''.join(
+        [random.choice('1234579qetyiasdfghjklzxcvbnm') for _ in range(L)]
+    )
 
-t = Trie('/tmp/'+genkey())
+t = Trie(f'/tmp/{genkey()}')
 
 def trie_test():
     o = {}

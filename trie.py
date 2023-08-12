@@ -31,8 +31,8 @@ class Trie():
 
     def __decode_key(self,key):
         o = ['0123456789abcdef'.find(x) for x in key[1:].encode('hex')]
-        if key[0] == '\x01' or key[0] == '\x03': o = o[1:]
-        if key[0] == '\x02' or key[0] == '\x03': o.append(16)
+        if key[0] in ['\x01', '\x03']: o = o[1:]
+        if key[0] in ['\x02', '\x03']: o.append(16)
         return o
         
     def __get_state(self,node,key):
@@ -155,12 +155,9 @@ class Trie():
             raise Exception("node not found in database")
         if len(curnode) == 2:
             key = self.__decode_key(curnode[0])
-            if key[-1] == 16: return 1
-            else: return self.__get_size(curnode[1])
+            return 1 if key[-1] == 16 else self.__get_size(curnode[1])
         elif len(curnode) == 17:
-            total = 0
-            for i in range(16):
-                total += self.__get_size(curnode[i])
+            total = sum(self.__get_size(curnode[i]) for i in range(16))
             if curnode[16]: total += 1
             return total
 
@@ -192,7 +189,7 @@ class Trie():
             if curnode[16]: o[chr(16)] = curnode[16]
             return o
         else:
-            raise Exception("bad curnode! "+curnode)
+            raise Exception(f"bad curnode! {curnode}")
 
     def to_dict(self,as_hex=False):
         d = self.__to_dict(self.root)
